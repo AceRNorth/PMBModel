@@ -75,7 +75,7 @@ Simulation::Simulation(InputParams input)
 	
 	for (int i=0; i < constants::num_gen; ++i) {
 		for (int j=0; j < constants::num_gen; ++j) {
-			for (int k=0; k < constants::num_gen; ++k) {
+			for (int k=0; k < 2*constants::num_gen; ++k) {
 				inher_fraction[i][j][k] = 0;
 			}
 		}
@@ -282,107 +282,52 @@ void Simulation::set_release_times(const std::filesystem::path& filepath)
  */
 void Simulation::set_inheritance(InheritanceParams inher_params)
 {
-	double gamma = inher_params.gamma;
-	double xi = inher_params.xi;
-	double e = inher_params.e;
+	double omega_M = inher_params.omega_M;
+	double omega_F = inher_params.omega_F;
+	double b=(1+inher_params.bias)*0.5;
+	std::cout<<"Sim1  "<<b<<std::endl;
+//juvenile types: (wwf,wzf,zzf,wwm,wzm,zzm), where w is wildtype, z is transgenic, f is female and m is male
+	std::array<double, 6> f_ww_ww = {0.5, 0, 0, 0.5, 0, 0};
+	std::array<double, 6> f_ww_wz = {(1-b)*0.5,(1-b)*0.5 , 0,b*0.5 , b*0.5, 0};
+	std::array<double, 6> f_ww_zz = {0,1-b , 0, 0, b, 0};
+	std::array<double, 6> f_wz_ww = {0.25, 0.25, 0, 0.25,0.25, 0};
+	std::array<double, 6> f_wz_wz = {(1-b)*0.25,(1-b)*0.5,(1-b)*0.25,b*0.25,b*0.5,b*0.25};
+	std::array<double, 6> f_wz_zz = {0,(1-b)*0.5,(1-b)*0.5,0,b*0.5,b*0.5};
+	std::array<double, 6> f_zz_ww = {0,0.5,0,0,0.5,0};
+	std::array<double, 6> f_zz_wz = {0,(1-b)*0.5,(1-b)*0.5,0,b*0.5,b*0.5};
+	std::array<double, 6> f_zz_zz = {0, 0,1-b , 0, 0, b};
 
-	// fraction of genotypes with index 0: ww, 1: wd, 2: dd, 3: wr, 4: rr, 5: dr
-	std::array<double, 6> f_ww_ww = {1, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_ww_wd = {(1 - e - gamma) * 0.5, (1 + e) * 0.5, 0, gamma * 0.5, 0, 0};
-	std::array<double, 6> f_ww_dd = {0, 1, 0, 0, 0, 0};
-	std::array<double, 6> f_ww_wr = {0.5, 0, 0, 0.5, 0, 0};
-	std::array<double, 6> f_ww_rr = {0, 0, 0, 1, 0, 0};
-	std::array<double, 6> f_ww_dr = {0, 0.5, 0, 0.5, 0, 0};
+	std::cout<<"Sim2  "<<b<<std::endl;
+	std::cout << std::extent<decltype(inher_fraction), 0>::value << " x "
+          << std::extent<decltype(inher_fraction), 1>::value << " x "
+          << std::extent<decltype(inher_fraction), 2>::value << "\n";
+	std::cout<<"Sim2  "<<b<<std::endl;
 
-	std::array<double, 6> f_wd_ww = {(1 - xi)*(1 - e - gamma)*0.5, (1 - xi)*(1 + e)*0.5, 0, (1 - xi)*gamma*0.5, 0, 0};
-	std::array<double, 6> f_wd_wd = {(1 - xi)*(1 - e - gamma)*(1 - e - gamma)* 0.25, (1 - xi)*(1 - e - gamma)*(1 + e)*0.5, (1 - xi)*(1 + e)*(1 + e)*0.25, (1 - xi)*(1 - e - gamma)*gamma*0.5, (1 - xi)*gamma*gamma*0.25, (1 - xi)*(1 + e)*gamma*0.5};
-	std::array<double, 6> f_wd_dd = {0, (1 - xi)*(1 - e - gamma)*0.5, (1 - xi)*(1 + e)*0.5, 0, 0, (1-xi)*gamma*0.5};
-	std::array<double, 6> f_wd_wr = {(1 - xi)*(1 - e - gamma)*0.25, (1 - xi)*(1 + e)*0.25, 0, (1 - xi)*((1 - e - gamma)*0.25 + (gamma * 0.25)), (1 - xi)*gamma*0.25, (1 - xi)*(1 + e)*0.25};
-	std::array<double, 6> f_wd_rr = {0, 0, 0, (1 - xi)*(1 - e - gamma)*0.5, (1 - xi)*gamma*0.5, (1 - xi)*(1 + e)*0.5};
-	std::array<double, 6> f_wd_dr = {0, (1 - xi)*(1 - e - gamma)*0.25, (1 - xi)*(1 + e)*0.25, (1 - xi)*(1 - e - gamma)*0.25, (1 - xi)*gamma*0.25, (1 - xi)*((1 + e)*0.25 + gamma*0.25)};
-	
-	std::array<double, 6> f_dd_ww = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dd_wd = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dd_dd = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dd_wr = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dd_rr = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dd_dr = {0, 0, 0, 0, 0, 0};
-
-	std::array<double, 6> f_wr_ww = {0.5, 0, 0, 0.5, 0, 0};
-	std::array<double, 6> f_wr_wd = {(1 - e - gamma)*0.25, (1 + e)*0.25, 0, (gamma * 0.25 + (1 - e - gamma) * 0.25), gamma*0.25, (1 + e)*0.25};
-	std::array<double, 6> f_wr_dd = {0, 0.5, 0, 0, 0, 0.5};
-	std::array<double, 6> f_wr_wr = {0.25, 0, 0, 0.5, 0.25, 0};
-	std::array<double, 6> f_wr_rr = {0, 0, 0, 0.5, 0.5, 0};
-	std::array<double, 6> f_wr_dr = {0, 0.25, 0, 0.25, 0.25, 0.25};
-
-	std::array<double, 6> f_rr_ww = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_rr_wd = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_rr_dd = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_rr_wr = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_rr_rr = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_rr_dr = {0, 0, 0, 0, 0, 0};
-
-	std::array<double, 6> f_dr_ww = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dr_wd = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dr_dd = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dr_wr = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dr_rr = {0, 0, 0, 0, 0, 0};
-	std::array<double, 6> f_dr_dr = {0, 0, 0, 0, 0, 0};
+// need to update inheritance code below!!
 
 	for (int k=0; k<6; ++k) {
-		for (int i=0; i<6; ++i) {
-			for (int j=0; j<6; ++j) {
+		for (int i=0; i<3;++i) {
+			for (int j=0; j<3; ++j) {
 				if (i==0) {
 					if (j==0) inher_fraction[i][j][k] = f_ww_ww[k];
-					else if (j==1) inher_fraction[i][j][k] = f_ww_wd[k];
-					else if (j==2) inher_fraction[i][j][k] = f_ww_dd[k];
-					else if (j==3) inher_fraction[i][j][k] = f_ww_wr[k];
-					else if (j==4) inher_fraction[i][j][k] = f_ww_rr[k];
-					else if (j==5) inher_fraction[i][j][k] = f_ww_dr[k];
+					else if (j==1) inher_fraction[i][j][k] = omega_M*f_ww_wz[k];
+					else if (j==2) inher_fraction[i][j][k] = omega_M*f_ww_zz[k];
 				}
 				else if (i==1) {
-					if (j==0) inher_fraction[i][j][k] = f_wd_ww[k];
-					else if (j==1) inher_fraction[i][j][k] = f_wd_wd[k];
-					else if (j==2) inher_fraction[i][j][k] = f_wd_dd[k];
-					else if (j==3) inher_fraction[i][j][k] = f_wd_wr[k];
-					else if (j==4) inher_fraction[i][j][k] = f_wd_rr[k];
-					else if (j==5) inher_fraction[i][j][k] = f_wd_dr[k];
+					if (j==0) inher_fraction[i][j][k] = omega_F*f_wz_ww[k];
+					else if (j==1) inher_fraction[i][j][k] = omega_F*omega_M*f_wz_wz[k];
+					else if (j==2) inher_fraction[i][j][k] = omega_F*omega_M*f_wz_zz[k];
 				}
 				else if (i==2) {
-					if (j==0) inher_fraction[i][j][k] = f_dd_ww[k];
-					else if (j==1) inher_fraction[i][j][k] = f_dd_wd[k];
-					else if (j==2) inher_fraction[i][j][k] = f_dd_dd[k];
-					else if (j==3) inher_fraction[i][j][k] = f_dd_wr[k];
-					else if (j==4) inher_fraction[i][j][k] = f_dd_rr[k];
-					else if (j==5) inher_fraction[i][j][k] = f_dd_dr[k];
+					if (j==0) inher_fraction[i][j][k] = omega_F*f_zz_ww[k];
+					else if (j==1) inher_fraction[i][j][k] = omega_F*omega_M*f_zz_wz[k];
+					else if (j==2) inher_fraction[i][j][k] = omega_F*omega_M*f_zz_zz[k];
 				}
-				else if (i==3) {
-					if (j==0) inher_fraction[i][j][k] = f_wr_ww[k];
-					else if (j==1) inher_fraction[i][j][k] = f_wr_wd[k];
-					else if (j==2) inher_fraction[i][j][k] = f_wr_dd[k];
-					else if (j==3) inher_fraction[i][j][k] = f_wr_wr[k];
-					else if (j==4) inher_fraction[i][j][k] = f_wr_rr[k];
-					else if (j==5) inher_fraction[i][j][k] = f_wr_dr[k];
-				}
-				else if (i==4) {
-					if (j==0) inher_fraction[i][j][k] = f_rr_ww[k];
-					else if (j==1) inher_fraction[i][j][k] = f_rr_wd[k];
-					else if (j==2) inher_fraction[i][j][k] = f_rr_dd[k];
-					else if (j==3) inher_fraction[i][j][k] = f_rr_wr[k];
-					else if (j==4) inher_fraction[i][j][k] = f_rr_rr[k];
-					else if (j==5) inher_fraction[i][j][k] = f_rr_dr[k];
-				}
-				else if (i==5) {
-					if (j==0) inher_fraction[i][j][k] = f_dr_ww[k];
-					else if (j==1) inher_fraction[i][j][k] = f_dr_wd[k];
-					else if (j==2) inher_fraction[i][j][k] = f_dr_dd[k];
-					else if (j==3) inher_fraction[i][j][k] = f_dr_wr[k];
-					else if (j==4) inher_fraction[i][j][k] = f_dr_rr[k];
-					else if (j==5) inher_fraction[i][j][k] = f_dr_dr[k];
-				}
+std::cout<<i<<"  "<<j<<"  "<<k<<"   "<<inher_fraction[i][j][k]<<std::endl;
 			}
 		}
 	}	
+	std::cout<<"Sim3  "<<b<<std::endl;
 }
 
 /**

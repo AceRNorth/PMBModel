@@ -35,7 +35,7 @@ public:
 	void juv_get_older();
 	void adults_die();
 	void virgins_mate();
-	void lay_eggs(const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, constants::num_gen> &f,
+	void lay_eggs(const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &f,
 	 const std::array<double, constants::max_dev+1> &dev_duration_probs);
 	void juv_eclose();
 	void update_comp();
@@ -66,7 +66,7 @@ private:
 
 	double humandens;
 
-	std::array<std::array<long long int, constants::max_dev+1>, constants::num_gen> J; /**< Number of juvenile mosquitoes in the patch, divided by genotype and age group. @note The age groups are ordered from oldest (0 days left to eclosion) to youngest (max_dev - 1 days left). */
+	std::array<std::array<long long int, constants::max_dev+1>, 2*constants::num_gen> J; /**< Number of juvenile mosquitoes in the patch, divided by genotype and age group. @note The age groups are ordered from oldest (0 days left to eclosion) to youngest (max_dev - 1 days left). */
 	std::array<long long int, constants::num_gen> M; /**< Number of male mosquitoes in the patch, divided by genotype. */ 
 	std::array<long long int, constants::num_gen> V; /**< Number of virgin (unmated) female mosquitoes, divided by genotype. */ 
 	std::array<std::array<long long int, constants::num_gen>, constants::num_gen> F; /**< Number of mated female mosquitoes F_{ij}, divided by female genotype i and male sperm genotype j. */ 

@@ -25,7 +25,7 @@ using namespace constants;
  * @param[in] disp_type		dispersal type
  * @param[in] coords		site coordinates vector
  */
-Model::Model(ModelParams* params, const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, constants::num_gen> &inher_frac, SineRainfallParams* season,
+Model::Model(ModelParams* params, const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &inher_frac, SineRainfallParams* season,
  double a0_mean, double a0_var, std::vector<int> rel_sites, BoundaryType boundary, DispersalType disp_type, std::vector<Point> coords,std::vector<double>humandens)
 {
 	num_pat = params->area->num_pat;
@@ -108,7 +108,7 @@ Model::Model(ModelParams* params, const std::array<std::array<std::array <double
  * @param[in] disp_type		dispersal type
  * @param[in] coords		site coordinates vector
  */
-Model::Model(ModelParams* params, const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, constants::num_gen> &inher_frac, InputRainfallParams *season,
+Model::Model(ModelParams* params, const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &inher_frac, InputRainfallParams *season,
  double a0_mean, double a0_var, std::vector<int> rel_sites, BoundaryType boundary, DispersalType disp_type, std::vector<Point> coords,std::vector<double>humandens)
 {
 	num_pat = params->area->num_pat;

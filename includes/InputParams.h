@@ -16,9 +16,13 @@ struct InputParams {
 	double comp_power; /**< Parameter that controls the juvenile survival probability. */
 	int min_dev; /**< Minimum development time for a juvenile (in days). */ 
 
-	double gamma; /**< Rate of r2 allele formation from W/D meiosis. */ 
-	double xi; /**< Somatic Cas9 expression fitness cost. */ 
-	double e; /**< Homing rate in females. */ 
+//	double gamma; 
+//	double xi; 
+//	double e; 
+
+	double bias;
+	double omega_M;
+	double omega_F;
 
 	int driver_start; /**< Time to start releasing drive alleles into the mosquito population. */ 
 	int num_driver_M; /**< Number of drive heterozygous (WD) male mosquitoes per release. */ 

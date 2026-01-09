@@ -13,7 +13,7 @@
 
 int main() {
     //std::string params_filename; 
-    //std::cin >> params_filename;
+    std::cout << "hello" <<std::endl;
 
     char boundary_type;
     char disp_type;
@@ -39,9 +39,9 @@ int main() {
 	int min_dev;
 
 	// gene drive inheritance parameters
-	double gamma;
-	double xi;
-	double e;
+	double bias;
+	double omega_M;
+	double omega_F;
 
 	// gene drive release parameters
 	int driver_start;
@@ -74,6 +74,7 @@ int main() {
 	int rec_interval_local;
 	int rec_sites_freq; 
 	int set_label;
+    std::cout << "hello2" <<std::endl;
 
     std::cin >> num_runs;
     std::cin >> max_t;
@@ -84,9 +85,9 @@ int main() {
     std::cin >> theta;
     std::cin >> comp_power;
     std::cin >> min_dev;
-    std::cin >> gamma;
-    std::cin >> xi;
-    std::cin >> e;
+    std::cin >> bias;
+    std::cin >> omega_M;
+    std::cin >> omega_F;
     std::cin >> driver_start;
     std::cin >> num_driver_M;
     std::cin >> num_driver_sites;
@@ -118,6 +119,8 @@ int main() {
     std::cin >> mu_a_filename;
     std::cin >> OutputType;
 
+    std::cout << "hello3" <<"   "<<OutputType<<std::endl;
+
     InputParams params;
     params.num_runs = num_runs;
     params.max_t = max_t;
@@ -128,9 +131,9 @@ int main() {
     params.theta = theta;
     params.comp_power = comp_power;
     params.min_dev = min_dev;
-    params.gamma = gamma;
-    params.xi = xi;
-    params.e = e;
+    params.bias = bias;
+    params.omega_M = omega_M;
+    params.omega_F = omega_F;
     params.driver_start = driver_start;
     params.num_driver_M = num_driver_M;
     params.num_driver_sites = num_driver_sites;
@@ -154,6 +157,7 @@ int main() {
     params.rec_sites_freq = rec_sites_freq;
     params.set_label = set_label;
    // num_rel_sites=num_driver_sites;
+    std::cout << "hello4" <<"  "<<set_label<<std::endl;
 
     BoundaryType boundary;
     if (boundary_type == 't') {
@@ -171,14 +175,17 @@ int main() {
         disp = Radial;
     }
 
+    std::cout << "hello5" <<"  "<<set_label<<std::endl;
     Simulation simulation(params);
+    std::cout << "hello6" <<"  "<<set_label<<std::endl;
     InheritanceParams inher;
-    inher.gamma = params.gamma;
-    inher.xi = params.xi;
-    inher.e = params.e;
+    inher.bias = params.bias;
+    inher.omega_M = params.omega_M;
+    inher.omega_F = params.omega_F;
     simulation.set_inheritance(inher);
     simulation.set_boundary_type(boundary);
     simulation.set_dispersal_type(disp);
+    std::cout << "hello7" <<"  "<<set_label<<std::endl;
 
     if (coords_filename != "none") {
         auto coords_filepath = std::filesystem::path(coords_filename);

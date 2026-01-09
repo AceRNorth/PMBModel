@@ -28,10 +28,12 @@ Patch::Patch(Model* mod, LifeParams* par, double a0, double side_x, double side_
 	coords = {x, y};
 	humandens=1;
 
-	for (int i=0; i < constants::num_gen; ++i) {
+	for (int i=0; i < 2*constants::num_gen; ++i) {
 		for (int a=0; a < constants::max_dev + 1; ++a) {
 			J[i][a] = 0; 
 		}
+	}
+	for (int i=0; i < constants::num_gen; ++i) {
 		M[i] = 0;
 		V[i] = 0;
 		for (int j=0; j < constants::num_gen; ++j) {
@@ -60,11 +62,13 @@ Patch::Patch(Model* mod, LifeParams* par, double a0, Point point, double humans)
 	// include to be able to compare data to test data when testing
 	double x = random_real();
 	double y = random_real();
-
-	for (int i=0; i < constants::num_gen; ++i) {
+	for (int i=0; i < 2*constants::num_gen; ++i) {
 		for (int a=0; a < constants::max_dev + 1; ++a) {
 			J[i][a] = 0; 
 		}
+	}
+
+	for (int i=0; i < constants::num_gen; ++i) {
 		M[i] = 0;
 		V[i] = 0;
 		for (int j=0; j < constants::num_gen; ++j) {
@@ -86,9 +90,10 @@ void Patch::populate(int initial_WJ, int initial_WM, int initial_WV, int initial
 {
 	for (int a=0; a < constants::max_dev + 1; ++a) {
 		J[0][a] += initial_WJ;
+		J[3][a] += initial_WJ;
 	}	
 	M[0] = initial_WM;
-	V[0] = initial_WV;
+//	V[0] = initial_WV;
 	F[0][0] = initial_WF;
 
 	update_comp();
@@ -127,7 +132,7 @@ std::array<std::array<long long int, constants::num_gen>, constants::num_gen> Pa
 long long int Patch::calculate_tot_J() 
 {
 	long long int tot_J = 0;
-	for (int i = 0; i < constants::num_gen; ++i) {
+	for (int i = 0; i < 2*constants::num_gen; ++i) {
 		for (int a = 0; a < constants::max_dev+1; ++a) {
 			tot_J += J[i][a];
 		}
@@ -266,7 +271,7 @@ void Patch::add_driver_M(int num_driver_M)
  */
 void Patch::juv_get_older() 
 {
-	for (int i=0; i < constants::num_gen; ++i) {
+	for (int i=0; i < 2*constants::num_gen; ++i) {
 		for (int a=0; a < constants::max_dev; ++a) {
 			// number of juveniles that survive aging by a day are placed into the new older age group	
 			J[i][a] = random_binomial(J[i][a+1], comp);
@@ -292,8 +297,8 @@ void Patch::adults_die()
 		V[i] -= v;	
 
 		for (int j=0; j < constants::num_gen; ++j) {
-			long long int f = random_binomial(F[i][j], mu_a_temp);
-	//		long long int f = random_binomial(F[i][j], mu_a);
+	//		long long int f = random_binomial(F[i][j], mu_a_temp);
+			long long int f = random_binomial(F[i][j], mu_a);
 			F[i][j] -= f;
 		}
 	}
@@ -330,17 +335,18 @@ void Patch::virgins_mate()
  * @param[in] dev_duration_probs 	probabilities for juvenile development duration of new offspring
  * @see Simulation::set_inheritance(), InputParams::theta
  */
-void Patch::lay_eggs(const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, constants::num_gen> &inher_fraction,
+void Patch::lay_eggs(const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &inher_fraction,
  const std::array<double, constants::max_dev+1> &dev_duration_probs)
 {
 	std::vector<long long int> j_new;
 	for (int i=0; i < constants::num_gen; ++i) {
 		for (int j=0; j < constants::num_gen; ++j) {
-			for (int k=0; k < constants::num_gen; ++k) {
+			for (int k=0; k < 2*constants::num_gen; ++k) {
 				double num = (params->theta) * F[i][j] * inher_fraction[i][j][k]; // expected number of eggs laid with k genotype
 				long long int eggs = random_poisson(num); // actual number of eggs laid sampled from random distribution
 
 				j_new = random_multinomial(eggs, dev_duration_probs); // number of eggs that start in each different age class (according to different juvenile development times)
+//if(i==0&&j==0)std::cout<<" lay eggs   "<<i<<"  "<<j<<"  "<<k<<"   "<<inher_fraction[i][j][k]<<"     "<<eggs<<std::endl;
 				for (int t=0; t < constants::max_dev + 1; ++t) { // juveniles created with assigned remaining time to develop
 					J[k][t] += j_new[t];
 				}
@@ -362,10 +368,19 @@ void Patch::juv_eclose()
 		long long int surv = random_binomial(J[i][0], comp); // number of juveniles that survive eclosion
 		J[i][0] = 0; // all the oldest juveniles either successfully eclose or die
 		if (surv > 0) {	
+//if(i==0)std::cout<<" females eclose   "<<i<<"     "<<surv<<std::endl;
+
 			// roughly half of the juveniles become male and half female following a distribution
-			long long int surv_m = random_binomial(surv, 0.5); 
-			M[i] += surv_m; 
-			V[i] += surv - surv_m;
+			V[i] += surv;
+		}
+	}
+	for (int i=constants::num_gen; i < 2*constants::num_gen; ++i) {
+		long long int surv = random_binomial(J[i][0], comp); // number of juveniles that survive eclosion
+		J[i][0] = 0; // all the oldest juveniles either successfully eclose or die
+		if (surv > 0) {	
+//if(i==3)std::cout<<" males eclose   "<<i<<"     "<<surv<<std::endl;
+			// roughly half of the juveniles become male and half female following a distribution
+			M[i-constants::num_gen] += surv; 
 		}
 	}
 	update_comp();

@@ -39,7 +39,7 @@ Record::Record(RecordParams* rec_params, int rep)
 
 		//local_data << day << "\t" << pat+1 << "\t" << patch_type[pat] << "\t" << count << "\t" << freq<<std::endl;
 	local_data << "Population info at each site\n";
-	local_data << "Day" << "\t" << "Site" << "\t" << "patch type" << "\t" << "biting females" << "\t" << "gene drive freq." << std::endl;
+	local_data << "Day" << "\t" << "Site" << "\t" << "patch type" << "\t" << "Fww" << "\t" << "Fwz" << "\t" << "Fzz"<< "\t" << "Mww" << "\t" << "Mwz" << "\t" << "Mzz"<<std::endl;
 
 	global_data << "Total females of each genotype\n";
 	global_data << "Day" << "\t" << "WW" << "\t" << "WD" << "\t" << "DD" << "\t" << "WR" << "\t" << "RR" << "\t" << "DR" << std::endl;
@@ -119,16 +119,18 @@ void Record::output_totals(int day, long long int tot_J, long long int tot_M, lo
 void Record::record_local(int day, const std::vector<Patch*> &sites) 
 {
 	int count,tot,gd,ind;
+	int f0,f1,f2;
 	for (int pat=0; pat < sites.size(); pat ++) 
 	{
 		if(patch_type[pat]>OutputType)
 		{
 		const auto& F = sites[pat]->get_F();
-		count= F[0][0]+ F[0][1]+ F[0][2]+ F[0][3]+ F[0][4]+ F[0][5]+ F[1][0]+ F[1][1]+ F[1][2]+ F[1][3]+ F[1][4]+ F[1][5]+ F[3][0]+ F[3][1]+ F[3][2]+ F[3][3]+ F[3][4]+ F[3][5];
-		tot=2*( F[0][0]+ F[0][1]+ F[0][2]+ F[0][3]+ F[0][4]+ F[0][5]+ F[1][0]+ F[1][1]+ F[1][2]+ F[1][3]+ F[1][4]+ F[1][5]+ F[2][0]+ F[2][1]+ F[2][2]+ F[2][3]+ F[2][4]+ F[2][5]+ F[3][0]+ F[3][1]+ F[3][2]+ F[3][3]+ F[3][4]+ F[3][5]+ F[4][0]+ F[4][1]+ F[4][2]+ F[4][3]+ F[4][4]+ F[4][5]+ F[5][0]+ F[5][1]+ F[5][2]+ F[5][3]+ F[5][4]+ F[5][5]);
-		gd= F[1][0]+ F[1][1]+ F[1][2]+ F[1][3]+ F[1][4]+ F[1][5]+ 2*(F[2][0]+ F[2][1]+ F[2][2]+ F[2][3]+ F[2][4]+ F[2][5])+ F[5][0]+ F[5][1]+ F[5][2]+ F[5][3]+ F[5][4]+ F[5][5];
-		double freq=1.0*gd/(1.0+1.0*tot);
-		local_data << day << "\t" << pat+1 << "\t" << patch_type[pat] << "\t" << count << "\t" << freq<<std::endl;
+		const auto& M = sites[pat]->get_M();
+
+		f0= F[0][0]+ F[0][1]+ F[0][2];
+		f1= F[1][0]+ F[1][1]+ F[1][2];
+		f2= F[2][0]+ F[2][1]+ F[2][2];
+		local_data << day << "\t" << pat+1 << "\t" << patch_type[pat] << "\t" << f0 << "\t" << f1 <<  "\t" <<f2<< "\t" <<M[0]<< "\t" <<M[1]<< "\t" <<M[2]<<std::endl;
 		}
 	}
 }

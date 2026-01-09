@@ -36,9 +36,12 @@ struct LifeParams {
  * Gene drive inheritance parameters.
  */ 
 struct InheritanceParams {
-	double gamma; /**< Rate of r2 allele formation from W/D meiosis. */ 
-	double xi; /**< Somatic Cas9 expression fitness cost. */ 
-	double e; /**< Homing rate in females. */ 
+//	double gamma; 
+//	double xi; 
+//	double e; 
+	double bias;
+	double omega_M;
+	double omega_F;
 };
 
 /**
