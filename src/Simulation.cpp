@@ -132,22 +132,19 @@ void Simulation::set_coords(const std::filesystem::path& filepath)
 				std::stringstream linestream(line);
 				if (line.size() == 0) break;
 
-				double x, y,bd,rand_effect;
-				int type,ass,index,relnum,tert;
+				double x, y,bd;
+				int type,ass,index,relnum;
 				char is_rel_site;
 				int err = 0;
 				if (!read_and_validate_type(linestream, x, "x" + std::to_string(i+1), "double")) err++;
 				if (!read_and_validate_type(linestream, y, "y" + std::to_string(i+1), "double")) err++;
 				if (!read_and_validate_type(linestream, bd, "build dens" + std::to_string(i+1), "double")) err++;
 				if (!read_and_validate_type(linestream, type, "patch type" + std::to_string(i+1), "int")) err++;
-				if (!read_and_validate_type(linestream, rand_effect, "random effect" + std::to_string(i+1), "double")) err++;
-				if (!read_and_validate_type(linestream, tert, "prevalence tertile" + std::to_string(i+1), "int")) err++;
 				
 				if (err == 0) {
 					temp_coords.push_back({x, y});
-					humans.push_back(bd*rand_effect);
+					humans.push_back(bd);
 					patch_type.push_back(type);
-					patch_tertile.push_back(tert);
 					if (type == 5)  release_sites.push_back(i); 
 				}
 			}
@@ -285,7 +282,7 @@ void Simulation::set_inheritance(InheritanceParams inher_params)
 	double omega_M = inher_params.omega_M;
 	double omega_F = inher_params.omega_F;
 	double b=(1+inher_params.bias)*0.5;
-	std::cout<<"Sim1  "<<b<<std::endl;
+	std::cout<<"Sim params   "<<b<<"   "<<omega_M<<"   "<<omega_F<<std::endl;
 //juvenile types: (wwf,wzf,zzf,wwm,wzm,zzm), where w is wildtype, z is transgenic, f is female and m is male
 	std::array<double, 6> f_ww_ww = {0.5, 0, 0, 0.5, 0, 0};
 	std::array<double, 6> f_ww_wz = {(1-b)*0.5,(1-b)*0.5 , 0,b*0.5 , b*0.5, 0};
@@ -297,13 +294,7 @@ void Simulation::set_inheritance(InheritanceParams inher_params)
 	std::array<double, 6> f_zz_wz = {0,(1-b)*0.5,(1-b)*0.5,0,b*0.5,b*0.5};
 	std::array<double, 6> f_zz_zz = {0, 0,1-b , 0, 0, b};
 
-	std::cout<<"Sim2  "<<b<<std::endl;
-	std::cout << std::extent<decltype(inher_fraction), 0>::value << " x "
-          << std::extent<decltype(inher_fraction), 1>::value << " x "
-          << std::extent<decltype(inher_fraction), 2>::value << "\n";
-	std::cout<<"Sim2  "<<b<<std::endl;
 
-// need to update inheritance code below!!
 
 	for (int k=0; k<6; ++k) {
 		for (int i=0; i<3;++i) {
@@ -323,11 +314,14 @@ void Simulation::set_inheritance(InheritanceParams inher_params)
 					else if (j==1) inher_fraction[i][j][k] = omega_F*omega_M*f_zz_wz[k];
 					else if (j==2) inher_fraction[i][j][k] = omega_F*omega_M*f_zz_zz[k];
 				}
-std::cout<<i<<"  "<<j<<"  "<<k<<"   "<<inher_fraction[i][j][k]<<std::endl;
 			}
 		}
 	}	
-	std::cout<<"Sim3  "<<b<<std::endl;
+
+
+
+//for (int i=0; i<3;++i) { for (int j=0; j<3; ++j) { for (int k=0; k<6; ++k) { std::cout<<"inherit  "<<i<<"  "<<j<<"  "<<k<<"   "<<inher_fraction[i][j][k]<<std::endl; }}}
+
 }
 
 /**
@@ -355,7 +349,7 @@ void Simulation::run_reps()
 			if (data.is_rec_global_time(tt)) {
 				data.output_totals(tt, model->calculate_tot_J(), model->calculate_tot_M(), model->calculate_tot_V(),
 				 model->calculate_tot_F());
-				data.record_global(tt, model->calculate_tot_M_gen());
+				data.record_global(tt, model->calculate_tot_M_gen(), model->calculate_tot_F_gen());
 			}
 			if (data.is_rec_local_time(tt)) {
 				data.record_local(tt, model->get_sites());

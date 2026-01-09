@@ -288,7 +288,6 @@ void Patch::juv_get_older()
 void Patch::adults_die()
 {
 	double mu_a = params->mu_a;
-	double mu_a_temp = mu_a_list[today];
 	for (int i=0; i < constants::num_gen; ++i) {
 		long long int m = random_binomial(M[i], mu_a); // number of males that die
 		M[i] -= m;
@@ -297,7 +296,6 @@ void Patch::adults_die()
 		V[i] -= v;	
 
 		for (int j=0; j < constants::num_gen; ++j) {
-	//		long long int f = random_binomial(F[i][j], mu_a_temp);
 			long long int f = random_binomial(F[i][j], mu_a);
 			F[i][j] -= f;
 		}
@@ -335,7 +333,7 @@ void Patch::virgins_mate()
  * @param[in] dev_duration_probs 	probabilities for juvenile development duration of new offspring
  * @see Simulation::set_inheritance(), InputParams::theta
  */
-void Patch::lay_eggs(const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &inher_fraction,
+void Patch::lay_eggs(const std::array<std::array<std::array <double, 2*constants::num_gen>, constants::num_gen>, constants::num_gen> &inher_fraction,
  const std::array<double, constants::max_dev+1> &dev_duration_probs)
 {
 	std::vector<long long int> j_new;

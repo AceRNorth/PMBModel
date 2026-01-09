@@ -50,7 +50,7 @@ private:
 	DispersalType disp_type;
 
 	// inheritance
-	std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> inher_fraction; /**< Inheritance fraction. f_ijk is the fraction of genotype k offspring from mother with genotype i mated to father with genotype j. */
+	std::array<std::array<std::array <double, 2*constants::num_gen>, constants::num_gen>, constants::num_gen> inher_fraction; /**< Inheritance fraction. f_ijk is the fraction of genotype k offspring from mother with genotype i mated to father with genotype j. */
 };
 
 #endif //GENERALMETAPOP_SIMULATION_H

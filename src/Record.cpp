@@ -41,8 +41,8 @@ Record::Record(RecordParams* rec_params, int rep)
 	local_data << "Population info at each site\n";
 	local_data << "Day" << "\t" << "Site" << "\t" << "patch type" << "\t" << "Fww" << "\t" << "Fwz" << "\t" << "Fzz"<< "\t" << "Mww" << "\t" << "Mwz" << "\t" << "Mzz"<<std::endl;
 
-	global_data << "Total females of each genotype\n";
-	global_data << "Day" << "\t" << "WW" << "\t" << "WD" << "\t" << "DD" << "\t" << "WR" << "\t" << "RR" << "\t" << "DR" << std::endl;
+	global_data << "Total number of adults in each class\n";
+	global_data << "Day" << "\t" << "Fww" << "\t" << "Fwz" << "\t" << "Fzz"<< "\t" << "Mww" << "\t" << "Mwz" << "\t" << "Mzz"<<std::endl;
 
 	coord_list << "Coordinate list of the sites\n";
 	coord_list << "Site" << "\t" << "x" << "\t" << "y" << std::endl;
@@ -81,14 +81,25 @@ void Record::record_coords(const std::vector<Patch*> &sites)
  * @param[in] tot_M_gen total number of males divided by genotype
  * @see Model::calculate_tot_M_gen(), Patch::get_M()
  */
-void Record::record_global(int day, const std::array<long long int, constants::num_gen> &tot_M_gen)
+void Record::record_global(int day, const std::array<long long int, constants::num_gen> &tot_M_gen,const std::array<long long int, constants::num_gen> &tot_F_gen)
+{
+	global_data << day;
+	for (const auto& f_gen : tot_F_gen) {
+		global_data << "\t" << f_gen;
+	}
+	for (const auto& m_gen : tot_M_gen) {
+		global_data << "\t" << m_gen;
+	}
+	global_data << std::endl;
+}
+/*void Record::record_global(int day, const std::array<long long int, constants::num_gen> &tot_M_gen)
 {
 	global_data << day;
 	for (const auto& m_gen : tot_M_gen) {
 		global_data << "\t" << m_gen;
 	}
 	global_data << std::endl;
-}
+}*/
 
 /**
  * @brief Outputs the total numbers of juvenile (J), male (M), virgin female (V) and mated female (F) mosquitoes for the given day.

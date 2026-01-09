@@ -25,7 +25,7 @@ using namespace constants;
  * @param[in] disp_type		dispersal type
  * @param[in] coords		site coordinates vector
  */
-Model::Model(ModelParams* params, const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &inher_frac, SineRainfallParams* season,
+Model::Model(ModelParams* params, const std::array<std::array<std::array <double, 2*constants::num_gen>, constants::num_gen>, constants::num_gen> &inher_frac, SineRainfallParams* season,
  double a0_mean, double a0_var, std::vector<int> rel_sites, BoundaryType boundary, DispersalType disp_type, std::vector<Point> coords,std::vector<double>humandens)
 {
 	num_pat = params->area->num_pat;
@@ -108,7 +108,7 @@ Model::Model(ModelParams* params, const std::array<std::array<std::array <double
  * @param[in] disp_type		dispersal type
  * @param[in] coords		site coordinates vector
  */
-Model::Model(ModelParams* params, const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &inher_frac, InputRainfallParams *season,
+Model::Model(ModelParams* params, const std::array<std::array<std::array <double, 2*constants::num_gen>, constants::num_gen>, constants::num_gen> &inher_frac, InputRainfallParams *season,
  double a0_mean, double a0_var, std::vector<int> rel_sites, BoundaryType boundary, DispersalType disp_type, std::vector<Point> coords,std::vector<double>humandens)
 {
 	num_pat = params->area->num_pat;
@@ -343,6 +343,38 @@ std::array<long long int, constants::num_gen> Model::calculate_tot_M_gen()
 	}
 	return tot_M_gen;
 }
+
+
+
+/**
+ * Returns the total number of females of each genotype across all patches.
+ * @return The total number of females in the model run, divided by genotype.
+ * @see Patch::get_M()
+ */
+std::array<long long int, constants::num_gen> Model::calculate_tot_F_gen() 
+{
+	std::array<long long int, constants::num_gen> tot_F_gen;
+	tot_F_gen.fill(0);
+	for (auto pat : sites) {
+		std::array<std::array<long long int, constants::num_gen>, constants::num_gen> f_pat = pat->get_F();
+		for (int i = 0; i < constants::num_gen; ++i) {
+		for (int j = 0; j < constants::num_gen; ++j) {
+			tot_F_gen[i] += f_pat[i][j];
+		}
+		}
+	}
+	return tot_F_gen;
+}
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Returns the sites vector.

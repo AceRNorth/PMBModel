@@ -20,7 +20,6 @@ int main() {
     std::string coords_filename; 
     std::string rainfall_filename; 
     std::string rel_times_filename;
-    std::string mu_a_filename;
 
     // input parameters
 	// progression parameters
@@ -74,7 +73,6 @@ int main() {
 	int rec_interval_local;
 	int rec_sites_freq; 
 	int set_label;
-    std::cout << "hello2" <<std::endl;
 
     std::cin >> num_runs;
     std::cin >> max_t;
@@ -116,10 +114,8 @@ int main() {
     std::cin >> coords_filename;
     std::cin >> rainfall_filename; 
     std::cin >> rel_times_filename;
-    std::cin >> mu_a_filename;
     std::cin >> OutputType;
 
-    std::cout << "hello3" <<"   "<<OutputType<<std::endl;
 
     InputParams params;
     params.num_runs = num_runs;
@@ -157,7 +153,6 @@ int main() {
     params.rec_sites_freq = rec_sites_freq;
     params.set_label = set_label;
    // num_rel_sites=num_driver_sites;
-    std::cout << "hello4" <<"  "<<set_label<<std::endl;
 
     BoundaryType boundary;
     if (boundary_type == 't') {
@@ -175,9 +170,7 @@ int main() {
         disp = Radial;
     }
 
-    std::cout << "hello5" <<"  "<<set_label<<std::endl;
     Simulation simulation(params);
-    std::cout << "hello6" <<"  "<<set_label<<std::endl;
     InheritanceParams inher;
     inher.bias = params.bias;
     inher.omega_M = params.omega_M;
@@ -185,7 +178,6 @@ int main() {
     simulation.set_inheritance(inher);
     simulation.set_boundary_type(boundary);
     simulation.set_dispersal_type(disp);
-    std::cout << "hello7" <<"  "<<set_label<<std::endl;
 
     if (coords_filename != "none") {
         auto coords_filepath = std::filesystem::path(coords_filename);
@@ -201,25 +193,6 @@ int main() {
     }
 
 
-	/*-----------------input file with adult female mortality data--------------------------*/
-    /*-------------this is for running CRT against Imperial malaria model with variable female mortality input---------*/
-    
-    if (mu_a_filename != "none") {
-		std::ostringstream ggg;
-		ggg.str(mu_a_filename);
-		std::ifstream mortdata(ggg.str().c_str()); 
-		double rr;
-		std::string line ="";
-		std::string cell;
-		while(std::getline(mortdata, line ))
-		{       
-			std::stringstream lineStream(line);
-			std::getline(lineStream,cell,',');
-			rr=std::strtod(cell.c_str(),NULL);
-			mu_a_list.push_back(rr);
-		};
-	    }
-	
     /*--------------------------------------------------------------------------------------*/
 
     simulation.run_reps();

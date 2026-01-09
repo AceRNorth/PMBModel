@@ -35,7 +35,7 @@ public:
 	void juv_get_older();
 	void adults_die();
 	void virgins_mate();
-	void lay_eggs(const std::array<std::array<std::array <double, constants::num_gen>, constants::num_gen>, 2*constants::num_gen> &f,
+	void lay_eggs(const std::array<std::array<std::array <double,2*constants::num_gen>, constants::num_gen>, constants::num_gen> &f,
 	 const std::array<double, constants::max_dev+1> &dev_duration_probs);
 	void juv_eclose();
 	void update_comp();
